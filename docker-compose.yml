@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BUILD_DIR: dist
+    image: frontend:local
+    ports:
+      - "0.0.0.0:8080:3000"        # accessible from any interface; container port is now 3000
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:3000
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: backend:local
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "0.0.0.0:3000:3000"      # accessible from any interface
+    restart: unless-stopped
+    # healthcheck disabled temporarily; add /health endpoint to backend app to re-enable
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
+    #   start_period: 5s
+    #   start_period: 5s

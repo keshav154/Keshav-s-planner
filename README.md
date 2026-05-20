@@ -172,3 +172,35 @@ Notes
 - If push is rejected because remote has changes: git pull --rebase origin main (or the target branch), resolve conflicts, then push.
 - For forks: push to your fork remote (origin) and open a PR against upstream.
 - For quick debugging of image/deploy issues use: kubectl get pods, kubectl logs <pod> and the k3s image import steps in this README.
+
+Run with Docker Compose (local, no registry)
+- Build and start both services:
+  docker-compose up --build -d
+
+- Access:
+  - Frontend: http://localhost:8080 (served by Node.js express server)
+  - Backend API: http://localhost:3000
+
+- Access from another machine on the network:
+  - Find your machine's IP:
+    # on Linux/Mac
+    ifconfig | grep "inet " | grep -v 127.0.0.1
+    # on Windows
+    ipconfig
+  - Replace <YOUR_IP> with the IP found above, then access:
+    - Frontend: http://<YOUR_IP>:8080
+    - Backend API: http://<YOUR_IP>:3000
+  - Example: http://192.168.1.100:8080
+
+- Notes:
+  - Frontend is now served directly by Node.js (no nginx required).
+  - Both services bind to 0.0.0.0 so they are accessible from any network interface.
+  - To stop and remove containers:
+    docker-compose down
+
+k3s / Raspberry Pi reminder
+- docker-compose runs on the Docker daemon; it does not deploy to k3s. For Raspberry Pi / k3s use the "Run on k3s (Raspberry Pi)" section above:
+  - Build images for the Pi's architecture (or build on the Pi).
+  - Import images into k3s containerd with: sudo k3s ctr images import <image.tar>
+  - Deploy to k3s using Helm or a manifest (compose-to-k8s tools exist but are not covered here).
+  - Deploy to k3s using Helm or a manifest (compose-to-k8s tools exist but are not covered here).
